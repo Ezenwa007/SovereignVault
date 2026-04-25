@@ -1,0 +1,4 @@
+streamlit
+web3
+python-dotenv
+cryptography
