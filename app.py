@@ -2,12 +2,15 @@ import streamlit as st
 from datetime import datetime
 from contract_utils import ContractUtils
 from vault_utils import SovereignVault
+from vault_index_db import initialize_vault_index, get_root_hash, get_all_sync_records
 
 st.set_page_config(page_title="SovereignVault", page_icon="🔒", layout="wide")
 
 st.title("🔒 SovereignVault")
 st.markdown("**Private Sovereign Agent Wallet + Memory Vault**")
-st.caption("Track 5: Privacy & Sovereign Infrastructure")
+st.caption("Privacy & Sovereign Infrastructure")
+
+initialize_vault_index()
 
 if "contracts" not in st.session_state:
     st.session_state.contracts = ContractUtils()
@@ -165,5 +168,21 @@ with tab4:
                     st.write(mem.get("content", ""))
         else:
             st.info("This agent's vault is empty. Give it instructions in the Chat tab.")
+
+    st.write("### Recovery")
+
+    if st.button("Restore Vault from 0G"):
+        root_hash = get_root_hash(agent_id)
+
+        if root_hash:
+            restored = vault.restore_from_0g(agent_id, root_hash)
+
+            if restored:
+                st.success("Vault restored automatically from 0G")
+                st.rerun()
+            else:
+                st.error("Recovery failed")
+        else:
+            st.warning("No 0G backup found for this agent")
 
 st.caption("SovereignVault • 0G APAC Hackathon 2026 • Privacy & Sovereign Infrastructure")
